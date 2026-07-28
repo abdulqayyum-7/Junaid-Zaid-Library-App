@@ -5,12 +5,13 @@ import 'package:http/http.dart' as http;
 import '../config/api_constants.dart';
 import 'secure_storage_service.dart';
 
-/// Thrown when a Koha API call gets a 401/403 — the stored token is
-/// missing, expired, or was rejected. Callers should treat this as "the
-/// session is no longer valid" and trigger a full logout (see
-/// AuthScope.of(context).onLogout in auth_scope.dart, which clears both
-/// the Koha token and the Firebase session together), not just retry
-/// the same call with the same dead token.
+/// Thrown when a Koha API call gets a 401/403 — the stored
+/// username/password is missing or was rejected (e.g. the student
+/// changed their password elsewhere since logging in here). Callers
+/// should treat this as "the session is no longer valid" and trigger a
+/// full logout (see AuthScope.of(context).onLogout in auth_scope.dart,
+/// which clears both the Koha credentials and the Firebase session
+/// together), not just retry the same call.
 class KohaSessionExpiredException implements Exception {
   const KohaSessionExpiredException();
   @override
@@ -18,11 +19,17 @@ class KohaSessionExpiredException implements Exception {
 }
 
 /// Updated Authentication Workflow, Step 16: "Koha Access Token gets
-/// attached to all API calls." This is that attachment mechanism — a
-/// thin wrapper around http.Client that reads the token saved by
-/// KohaAuthService.login() (via SecureStorageService) and adds it as a
-/// Bearer Authorization header to every request automatically, so
-/// individual feature code never has to remember to do it by hand.
+/// attached to all API calls." This is that attachment mechanism.
+///
+/// CORRECTED: the real Koha 25 instance's working login endpoint
+/// (/api/v1/auth/password/validation, see KohaAuthService) never
+/// issues a token — confirmed via Postman. So there is no bearer token
+/// to attach here. Instead, EVERY call this client makes resends HTTP
+/// Basic Auth built from the student's own username + password (saved
+/// at login by SecureStorageService) — this Koha install is
+/// Basic-Auth-per-request throughout, not session/token-based, and
+/// koha_auth_service.dart and this file need to agree on that
+/// consistently.
 ///
 /// SCOPE NOTE: as of this phase, this app has no catalog / checkouts /
 /// holds / renewals / fines screens or services yet — grepping lib/ for
@@ -49,12 +56,14 @@ class KohaApiClient {
         _secureStorage = secureStorage ?? SecureStorageService();
 
   Future<Map<String, String>> _authHeaders() async {
-    final token = await _secureStorage.readToken();
-    if (token == null || token.isEmpty) {
+    final username = await _secureStorage.readUsername();
+    final password = await _secureStorage.readPassword();
+    if (username == null || username.isEmpty || password == null || password.isEmpty) {
       throw const KohaSessionExpiredException();
     }
+    final basicAuthValue = base64Encode(utf8.encode('$username:$password'));
     return {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Basic $basicAuthValue',
       'Content-Type': 'application/json',
     };
   }
@@ -72,10 +81,10 @@ class KohaApiClient {
   Future<http.Response> post(String path, {Object? body}) async {
     final response = await _client
         .post(
-          _resolve(path),
-          headers: await _authHeaders(),
-          body: body == null ? null : jsonEncode(body),
-        )
+      _resolve(path),
+      headers: await _authHeaders(),
+      body: body == null ? null : jsonEncode(body),
+    )
         .timeout(ApiConstants.requestTimeout);
     _throwIfSessionExpired(response);
     return response;
@@ -84,10 +93,10 @@ class KohaApiClient {
   Future<http.Response> put(String path, {Object? body}) async {
     final response = await _client
         .put(
-          _resolve(path),
-          headers: await _authHeaders(),
-          body: body == null ? null : jsonEncode(body),
-        )
+      _resolve(path),
+      headers: await _authHeaders(),
+      body: body == null ? null : jsonEncode(body),
+    )
         .timeout(ApiConstants.requestTimeout);
     _throwIfSessionExpired(response);
     return response;

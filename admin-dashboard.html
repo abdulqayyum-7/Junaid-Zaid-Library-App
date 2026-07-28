@@ -1,158 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Junaid Zaidi Library - Admin</title>
-<style>
-  :root {
-    --brand: #1D4ED8;
-    --brand-dark: #1E40AF;
-    --bg: #F8FAFC;
-    --surface: #FFFFFF;
-    --border: #E2E8F0;
-    --text: #0F172A;
-    --text-secondary: #64748B;
-    --success-bg: #DCFCE7;
-    --success-fg: #166534;
-    --error-bg: #FEE2E2;
-    --error-fg: #991B1B;
-    --pending-bg: #FEF9C3;
-    --pending-fg: #854D0E;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-  }
-  #login-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .login-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px 32px;
-    width: 100%;
-    max-width: 380px;
-    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-  }
-  .login-mark {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    background: var(--brand);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 20px;
-    margin: 0 auto 20px;
-  }
-  .login-card h1 { font-size: 20px; text-align: center; margin: 0 0 4px; }
-  .login-card p.sub { text-align: center; color: var(--text-secondary); font-size: 14px; margin: 0 0 24px; }
-  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
-  input[type="email"], input[type="password"] {
-    width: 100%;
-    padding: 11px 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 15px;
-    margin-bottom: 16px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input[type="email"]:focus, input[type="password"]:focus { border-color: var(--brand); }
-  button {
-    cursor: pointer;
-    border: none;
-    font-weight: 600;
-    font-size: 15px;
-    border-radius: 10px;
-    transition: opacity 0.15s;
-  }
-  button:hover { opacity: 0.9; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-primary { width: 100%; padding: 12px; background: var(--brand); color: white; }
-  #login-error { color: var(--error-fg); font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
-  #dashboard-screen { display: none; }
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .header-mark {
-    width: 36px; height: 36px; border-radius: 9px; background: var(--brand);
-    color: white; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 13px;
-  }
-  header h2 { font-size: 16px; margin: 0; }
-  header p { font-size: 12px; color: var(--text-secondary); margin: 0; }
-  #logout-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }
-  main { max-width: 1100px; margin: 0 auto; padding: 32px; }
-  .section-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-  .section-tab {
-    padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700;
-    background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border);
-  }
-  .section-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
-  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
-  .tab {
-    padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;
-    background: transparent; color: var(--text-secondary); border: none;
-  }
-  .tab.active { background: var(--surface); color: var(--brand); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .card-list { display: flex; flex-direction: column; gap: 12px; }
-  .request-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 24px;
-  }
-  .request-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
-  .request-name { font-size: 17px; font-weight: 700; margin: 0 0 2px; }
-  .request-regnum { font-size: 13px; color: var(--text-secondary); }
-  .badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-  .badge.pending { background: var(--pending-bg); color: var(--pending-fg); }
-  .badge.approved { background: var(--success-bg); color: var(--success-fg); }
-  .badge.rejected { background: var(--error-bg); color: var(--error-fg); }
-  .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px 24px;
-    margin: 16px 0;
-  }
-  .detail-item .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary); margin-bottom: 2px; }
-  .detail-item .detail-value { font-size: 14px; }
-  .processing-error {
-    margin: 12px 0 4px;
-    padding: 10px 14px;
-    background: var(--error-bg);
-    color: var(--error-fg);
-    border-radius: 10px;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  .processing-error strong { display: block; margin-bottom: 2px; }
-  .request-actions { display: flex; gap: 10px; margin-top: 4px; }
-  .btn-approve { padding: 9px 18px; background: var(--success-fg); color: white; }
-  .btn-reject { padding: 9px 18px; background: var(--surface); color: var(--error-fg); border: 1px solid var(--error-fg); }
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
-  #access-denied { display: none; text-align: center; padding: 80px 24px; }
-  #access-denied h2 { margin-bottom: 8px; }
-  #access-denied p { color: var(--text-secondary); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junaid Zaidi Library - Admin</title>
+  <!-- CryptoJS: decrypts the AES-encrypted pending password on Approve.
+       Must produce output identical to lib/services/crypto_service.dart's
+       encryptPassword — same shared secret, same AES-256-CBC/PKCS7 scheme. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <style>
+    :root {
+      --brand: #1D4ED8;
+      --brand-dark: #1E40AF;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-secondary: #64748B;
+      --success-bg: #DCFCE7;
+      --success-fg: #166534;
+      --error-bg: #FEE2E2;
+      --error-fg: #991B1B;
+      --pending-bg: #FEF9C3;
+      --pending-fg: #854D0E;
+      --info-bg: #DBEAFE;
+      --info-fg: #1E40AF;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+    }
+    .login-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: var(--brand);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      margin: 0 auto 20px;
+    }
+    .login-card h1 { font-size: 20px; text-align: center; margin: 0 0 4px; }
+    .login-card p.sub { text-align: center; color: var(--text-secondary); font-size: 14px; margin: 0 0 24px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+    input[type="email"], input[type="password"], input[type="text"], input[type="url"] {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.15s;
+      background: white;
+    }
+    input:focus { border-color: var(--brand); }
+    button {
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: 10px;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { width: 100%; padding: 12px; background: var(--brand); color: white; }
+    #login-error { color: var(--error-fg); font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
+    #dashboard-screen { display: none; }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-mark {
+      width: 36px; height: 36px; border-radius: 9px; background: var(--brand);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px;
+    }
+    header h2 { font-size: 16px; margin: 0; }
+    header p { font-size: 12px; color: var(--text-secondary); margin: 0; }
+    #logout-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    main { max-width: 1100px; margin: 0 auto; padding: 32px; }
+    .section-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .section-tab {
+      padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700;
+      background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border);
+    }
+    .section-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab {
+      padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      background: transparent; color: var(--text-secondary); border: none;
+    }
+    .tab.active { background: var(--surface); color: var(--brand); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+    .request-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .request-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .request-name { font-size: 17px; font-weight: 700; margin: 0 0 2px; }
+    .request-regnum { font-size: 13px; color: var(--text-secondary); }
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .badge.pending { background: var(--pending-bg); color: var(--pending-fg); }
+    .badge.approved { background: var(--success-bg); color: var(--success-fg); }
+    .badge.rejected { background: var(--error-bg); color: var(--error-fg); }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px 24px;
+      margin: 16px 0;
+    }
+    .detail-item .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary); margin-bottom: 2px; }
+    .detail-item .detail-value { font-size: 14px; }
+    .processing-error {
+      margin: 12px 0 4px;
+      padding: 10px 14px;
+      background: var(--error-bg);
+      color: var(--error-fg);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .processing-error strong { display: block; margin-bottom: 2px; }
+    .processing-note {
+      margin: 12px 0 4px;
+      padding: 10px 14px;
+      background: var(--info-bg);
+      color: var(--info-fg);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .request-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-approve { padding: 9px 18px; background: var(--success-fg); color: white; }
+    .btn-reject { padding: 9px 18px; background: var(--surface); color: var(--error-fg); border: 1px solid var(--error-fg); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    #access-denied { display: none; text-align: center; padding: 80px 24px; }
+    #access-denied h2 { margin-bottom: 8px; }
+    #access-denied p { color: var(--text-secondary); }
+    .settings-toggle {
+      display: inline-block; font-size: 13px; color: var(--brand); cursor: pointer;
+      text-decoration: underline; margin-bottom: 16px; font-weight: 600;
+    }
+    .settings-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; margin-bottom: 20px;
+    }
+    .settings-panel h3 { font-size: 14px; margin: 0 0 4px; }
+    .settings-panel p.hint { font-size: 13px; color: var(--text-secondary); margin: 0 0 16px; }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 20px; }
+    .settings-saved { font-size: 12px; color: var(--success-fg); margin-left: 10px; }
+  </style>
 </head>
 <body>
 
@@ -191,6 +219,49 @@
   </header>
 
   <main>
+    <span class="settings-toggle" id="settings-toggle">Koha connection settings</span>
+    <div class="settings-panel" id="settings-panel" style="display:none;">
+      <h3>Koha staff API (used only when you click Approve)</h3>
+      <p class="hint">
+        These run from THIS browser, on this machine — since Koha is running on the same
+        machine, 127.0.0.1 is correct here (this is different from the Android emulator,
+        which needs 10.0.2.2 instead — that's a separate setting inside the Flutter app itself,
+        not this page). The client secret is kept in memory for this tab only and re-entered
+        each session; everything else is remembered via this browser's local storage. If you
+        just generated a NEW client id/key pair in Koha, retype BOTH fields below together —
+        don't trust whatever is already sitting in either field after a reload, since only the
+        Client ID (not the Secret) is remembered across sessions by design.
+        <br><br>
+        <strong>Never paste your client secret into this file's source code.</strong> Type it
+        in here at runtime instead — anyone who can read the HTML file (or a copy of it you
+        share, e.g. to ask for help) can read a hardcoded value straight out of it.
+      </p>
+      <div class="settings-grid">
+        <div>
+          <label for="set-base-url">Koha base URL</label>
+          <input type="url" id="set-base-url" value="http://127.0.0.1:9090">
+        </div>
+        <div>
+          <label for="set-category">Patron category code</label>
+          <input type="text" id="set-category" value="ST">
+        </div>
+        <div>
+          <label for="set-branch">Library branch code</label>
+          <input type="text" id="set-branch" value="CPL">
+        </div>
+        <div>
+          <label for="set-client-id">OAuth client ID</label>
+          <input type="text" id="set-client-id" value="">
+        </div>
+        <div>
+          <label for="set-client-secret">OAuth client secret</label>
+          <input type="password" id="set-client-secret" value="" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn-primary" id="save-settings-btn" style="width:auto;padding:9px 18px;">Save for this session</button>
+      <span class="settings-saved" id="settings-saved" style="display:none;">Saved.</span>
+    </div>
+
     <div class="section-tabs">
       <button class="section-tab active" data-section="student_requests">Registrations</button>
       <button class="section-tab" data-section="password_change_requests">Password Changes</button>
@@ -226,6 +297,20 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // A SECOND, independent Firebase app instance pointed at the same
+  // project, used ONLY to create a brand-new student's account on
+  // Approve. Calling createUserWithEmailAndPassword() on the PRIMARY
+  // app would sign the admin's own browser session in as that new
+  // student the instant it succeeds — this "secondary app" trick avoids
+  // that entirely, and needs no backend/Admin SDK to work.
+  const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+  const secondaryAuth = secondaryApp.auth();
+
+  // Must be IDENTICAL to CryptoConstants.passwordEncryptionSharedSecret
+  // in lib/config/crypto_constants.dart, or decryption below silently
+  // produces garbage instead of a real password.
+  const PENDING_PASSWORD_SECRET = "6c48bf185ec43acc142f2fdad9c30a0a2b6b296d17ab2e691f165c6c3d32f778";
+
   const loginScreen = document.getElementById('login-screen');
   const dashboardScreen = document.getElementById('dashboard-screen');
   const accessDenied = document.getElementById('access-denied');
@@ -236,25 +321,283 @@
   const emptyState = document.getElementById('empty-state');
   const adminEmailLabel = document.getElementById('admin-email');
   const sectionHeading = document.getElementById('section-heading');
+  const settingsToggle = document.getElementById('settings-toggle');
+  const settingsPanel = document.getElementById('settings-panel');
+  const saveSettingsBtn = document.getElementById('save-settings-btn');
+  const settingsSaved = document.getElementById('settings-saved');
 
+  // ------------------------------------------------------------------
+  // Koha connection settings — the 5 inputs above. The client secret is
+  // never written to localStorage; everything else is, so you don't
+  // have to retype it every reload. RETYPE BOTH client ID and secret
+  // TOGETHER whenever you generate a new key pair in Koha — the ID
+  // alone persisting across reloads while the secret resets to blank
+  // is what caused the "403 access_denied" mismatch earlier; don't
+  // assume either field's current value is correct without checking.
+  // ------------------------------------------------------------------
+  const koha = {
+    baseUrl: '', category: '', branch: '', clientId: '', clientSecret: '',
+  };
+
+  function loadSavedKohaSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('kohaDashboardSettings') || '{}');
+      if (saved.baseUrl) document.getElementById('set-base-url').value = saved.baseUrl;
+      if (saved.category) document.getElementById('set-category').value = saved.category;
+      if (saved.branch) document.getElementById('set-branch').value = saved.branch;
+      if (saved.clientId) document.getElementById('set-client-id').value = saved.clientId;
+    } catch (_) { /* ignore malformed/missing localStorage data */ }
+    readKohaSettingsFromForm();
+  }
+
+  function readKohaSettingsFromForm() {
+    koha.baseUrl = document.getElementById('set-base-url').value.trim().replace(/\/$/, '');
+    koha.category = document.getElementById('set-category').value.trim();
+    koha.branch = document.getElementById('set-branch').value.trim();
+    koha.clientId = document.getElementById('set-client-id').value.trim();
+    koha.clientSecret = document.getElementById('set-client-secret').value;
+  }
+
+  settingsToggle.addEventListener('click', () => {
+    settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  saveSettingsBtn.addEventListener('click', () => {
+    readKohaSettingsFromForm();
+    localStorage.setItem('kohaDashboardSettings', JSON.stringify({
+      baseUrl: koha.baseUrl, category: koha.category, branch: koha.branch, clientId: koha.clientId,
+      // clientSecret deliberately NOT persisted
+    }));
+    settingsSaved.style.display = 'inline';
+    setTimeout(() => { settingsSaved.style.display = 'none'; }, 2000);
+  });
+
+  loadSavedKohaSettings();
+
+  // ------------------------------------------------------------------
+  // AES decrypt — must exactly mirror crypto_service.dart's
+  // encryptPassword: key = SHA-256(secret), first 16 bytes of the
+  // decoded blob = IV, the rest = ciphertext, AES-256-CBC, PKCS7 padding.
+  // ------------------------------------------------------------------
+  function decryptPendingPassword(base64Combined, secret) {
+    const key = CryptoJS.SHA256(secret);
+    const combined = CryptoJS.enc.Base64.parse(base64Combined);
+    // CryptoJS WordArrays are 32-bit words (4 bytes each), so 16 bytes = 4 words.
+    const ivWords = combined.words.slice(0, 4);
+    const iv = CryptoJS.lib.WordArray.create(ivWords, 16);
+    const ctWords = combined.words.slice(4);
+    const ciphertext = CryptoJS.lib.WordArray.create(ctWords, combined.sigBytes - 16);
+    const decrypted = CryptoJS.AES.decrypt(
+      { ciphertext: ciphertext }, key,
+      { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+    );
+    const plain = decrypted.toString(CryptoJS.enc.Utf8);
+    if (!plain) throw new Error('Decryption produced an empty result - check PENDING_PASSWORD_SECRET matches CryptoConstants.passwordEncryptionSharedSecret.');
+    return plain;
+  }
+
+  // ------------------------------------------------------------------
+  // Firebase account creation (brand new students only) — via the
+  // secondary app so the admin's own session is untouched.
+  // ------------------------------------------------------------------
+  async function createFirebaseAccount(email, password) {
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+    await secondaryAuth.signOut();
+    return uid;
+  }
+
+  // ------------------------------------------------------------------
+  // Koha staff OAuth2 client-credentials token — a DIFFERENT credential
+  // from the student login endpoint the Flutter app calls directly.
+  // Requires the owning patron of this Client ID/Secret to hold at
+  // least `borrowers` (list_borrowers + edit_borrowers) permission, or
+  // Superlibrarian.
+  //
+  // FIXED: sends client_id/client_secret as HTTP Basic Auth in the
+  // Authorization header (grant_type alone in the body) — this matches
+  // the exact request shape already confirmed working end-to-end in
+  // Postman (200 OK). A previous hand-edit of this function to switch
+  // to Basic Auth had a typo ("aasync" instead of "async") that broke
+  // JavaScript parsing for the ENTIRE script tag — which is why nothing
+  // on the page worked at all (no button, tab, or login handler could
+  // attach), not just Approve. That typo is fixed here.
+  // ------------------------------------------------------------------
+  async function getKohaAccessToken() {
+    const basic = btoa(`${koha.clientId}:${koha.clientSecret}`);
+
+    const res = await fetch(`${koha.baseUrl}/api/v1/oauth/token`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${basic}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+      },
+      body: new URLSearchParams({ grant_type: 'client_credentials' }),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(`Koha OAuth token request failed: ${res.status} ${text}`);
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (_) {
+      throw new Error('Koha OAuth token response was not valid JSON.');
+    }
+    if (!data.access_token) throw new Error('Koha did not return an access token.');
+    return data.access_token;
+  }
+
+  async function findKohaPatronByEmail(accessToken, email) {
+    const url = `${koha.baseUrl}/api/v1/patrons?email=${encodeURIComponent(email)}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`Koha patron lookup failed: ${res.status} ${await res.text()}`);
+    const patrons = await res.json();
+    return Array.isArray(patrons) && patrons.length > 0 ? patrons[0] : null;
+  }
+
+  /// FIXED: this Koha instance's /api/v1/patrons schema rejects
+  /// `password` as a direct property on patron creation — confirmed via
+  /// a real 400 "Properties not allowed: password" response. Patron
+  /// creation now happens WITHOUT a password, then the password is set
+  /// via a separate updateKohaPatronPassword() call right after,
+  /// reusing the same PUT-based password endpoint the password-change
+  /// flow already uses further down this file.
+  async function createKohaPatron(accessToken, details) {
+    const parts = details.fullName.trim().split(/\s+/);
+    const firstname = parts[0] || details.fullName.trim();
+    const surname = parts.length > 1 ? parts.slice(1).join(' ') : firstname;
+
+    const body = {
+      category_id: koha.category,
+      library_id: koha.branch,
+      firstname, surname,
+      email: details.email,
+      userid: details.email,
+      cardnumber: details.registrationNumber,
+    };
+    if (details.phone) body.mobile = details.phone;
+    // Koha has no first-class "department"/"cnic" field out of the box.
+    // If your instance has Patron Attribute Types for these
+    // (Administration -> Patron attribute types), add them here as
+    // extended_attributes: [{ type: 'DEPT', value: details.department }, ...].
+    // Left out rather than guessed, since attribute codes are specific
+    // to your Koha instance's configuration.
+
+    const res = await fetch(`${koha.baseUrl}/api/v1/patrons`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`Koha patron creation failed: ${res.status} ${await res.text()}`);
+    const patron = await res.json();
+
+    // Set the password as a separate step — see the FIXED note above.
+    const newPatronId = patron.patron_id ?? patron.borrowernumber;
+    await updateKohaPatronPassword(accessToken, newPatronId, details.password);
+
+    return patron;
+  }
+
+  /** Reuses an existing patron by email if one exists (retry-safety), else creates one.
+   * Either way, the password is (re)synced to the just-decrypted value here — this is
+   * what keeps the Firebase account and the Koha patron on the same password even when
+   * the patron already existed (e.g. from a prior partial-failure retry, or for any
+   * other reason a patron with this email was already in Koha). Setting the same
+   * password again on a genuine retry is a harmless no-op. */
+  async function createOrFindKohaPatron(accessToken, details) {
+    const existing = await findKohaPatronByEmail(accessToken, details.email);
+    if (existing) {
+      const patronId = existing.patron_id ?? existing.borrowernumber;
+      await updateKohaPatronPassword(accessToken, patronId, details.password);
+      return existing;
+    }
+    return createKohaPatron(accessToken, details);
+  }
+
+  /** TEMPORARY — diagnostic version. Koha 26's exact password-setting
+   * endpoint hasn't been confirmed yet on this instance (PUT
+   * /patrons/{id} rejects "password" as a property; PUT
+   * /patrons/{id}/password 404s). This tries a short list of plausible
+   * candidates in order and stops at the first one that isn't a
+   * 404/405, logging every attempt to the browser console (F12 ->
+   * Console) so you can see exactly which path/method Koha actually
+   * accepts here. Once you know the right one, tell me and this goes
+   * back to a single, direct call — this multi-try version is not
+   * meant to stay long-term. */
+  async function updateKohaPatronPassword(accessToken, patronId, newPassword) {
+    const candidates = [
+      { method: 'PATCH', url: `${koha.baseUrl}/api/v1/patrons/${patronId}`,
+        body: { password: newPassword, password_2: newPassword } },
+      { method: 'PATCH', url: `${koha.baseUrl}/api/v1/patrons/${patronId}/password`,
+        body: { password: newPassword, password_2: newPassword } },
+      { method: 'PUT', url: `${koha.baseUrl}/api/v1/patrons/${patronId}/password`,
+        body: { password: newPassword, password_2: newPassword } },
+      { method: 'POST', url: `${koha.baseUrl}/api/v1/patrons/${patronId}/password`,
+        body: { password: newPassword, password_2: newPassword } },
+    ];
+
+    const attempts = [];
+
+    for (const candidate of candidates) {
+      const res = await fetch(candidate.url, {
+        method: candidate.method,
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(candidate.body),
+      });
+      const text = await res.text();
+      attempts.push(`${candidate.method} ${candidate.url} -> ${res.status}`);
+      console.log(`[Koha password attempt] ${candidate.method} ${candidate.url} -> ${res.status}`, text);
+
+      if (res.ok) {
+        console.log('[Koha password] SUCCESS with', candidate.method, candidate.url);
+        return;
+      }
+      // 404/405 = "wrong path/method entirely", so keep trying the next
+      // candidate. Anything else (400, 403, etc.) means Koha found the
+      // right endpoint but rejected the request for a real reason
+      // (bad body shape, permissions, password policy) — stop and
+      // surface that instead of masking it behind more guesses.
+      if (res.status !== 404 && res.status !== 405) {
+        throw new Error(`Koha password update failed: ${res.status} ${text}`);
+      }
+    }
+
+    throw new Error(
+      `Koha password update failed: none of the tried endpoints worked. Attempts:\n${attempts.join('\n')}\n` +
+      `Check the Console (F12) for full response bodies, or run GET ${koha.baseUrl}/api/v1/ in Postman and search "password" in the spec.`
+    );
+  }
+
+  // ------------------------------------------------------------------
   // Updated Authentication Workflow, Phase 5: two collections now feed
   // this same list UI — student_requests (registration, Phase 1-3) and
   // password_change_requests (Phase 7). Config-driven per section
   // rather than duplicating subscribeToRequests/renderRequests twice.
+  // ------------------------------------------------------------------
   const SECTIONS = {
     student_requests: {
       heading: 'Registration Requests',
       renderCard: renderStudentRequestCard,
+      onApprove: approveStudentRequest,
+      onReject: (id) => setStatus('student_requests', id, 'Rejected', { encryptedPassword: firebase.firestore.FieldValue.delete() }),
     },
     password_change_requests: {
       heading: 'Password Change Requests',
       renderCard: renderPasswordChangeCard,
+      onApprove: approvePasswordChangeRequest,
+      onReject: (id) => setStatus('password_change_requests', id, 'Rejected', { newEncryptedPassword: firebase.firestore.FieldValue.delete() }),
     },
   };
 
   let currentSection = 'student_requests';
   let currentFilter = 'Pending';
   let unsubscribeRequests = null;
+  let latestDocsById = {};
 
   function showScreen(name) {
     loginScreen.style.display = name === 'login' ? 'flex' : 'none';
@@ -337,6 +680,9 @@
   }
 
   function renderRequests(docs) {
+    latestDocsById = {};
+    docs.forEach((doc) => { latestDocsById[doc.id] = doc; });
+
     if (docs.length === 0) {
       requestList.innerHTML = '';
       emptyState.style.display = 'block';
@@ -345,12 +691,156 @@
     emptyState.style.display = 'none';
     const renderCard = SECTIONS[currentSection].renderCard;
     requestList.innerHTML = docs.map((doc) => renderCard(doc)).join('');
+
+    docs.forEach((doc) => {
+      const data = doc.data();
+      if ((data.status || 'Pending') !== 'Pending') return;
+      const approveBtn = document.getElementById(`approve-${doc.id}`);
+      const rejectBtn = document.getElementById(`reject-${doc.id}`);
+      if (approveBtn) approveBtn.addEventListener('click', () => handleApprove(doc.id));
+      if (rejectBtn) rejectBtn.addEventListener('click', () => handleReject(doc.id));
+    });
   }
 
-  // Surfaced on BOTH sections — functions/index.js writes
-  // `processingError` when the Cloud Function fails partway through
-  // (e.g. Koha unreachable), on either onStudentRequestApproved or
-  // onPasswordChangeApproved. Without this, an admin approving a
+  async function handleApprove(requestId) {
+    readKohaSettingsFromForm();
+    if (!koha.baseUrl || !koha.category || !koha.branch || !koha.clientId || !koha.clientSecret) {
+      alert('Fill in Koha connection settings (top of page) before approving.');
+      return;
+    }
+    const approveBtn = document.getElementById(`approve-${requestId}`);
+    const rejectBtn = document.getElementById(`reject-${requestId}`);
+    if (approveBtn) approveBtn.disabled = true;
+    if (rejectBtn) rejectBtn.disabled = true;
+    try {
+      await SECTIONS[currentSection].onApprove(requestId);
+    } catch (err) {
+      console.error(err);
+      await db.collection(currentSection).doc(requestId).update({
+        processingError: err.message || String(err),
+      }).catch(() => {});
+      if (approveBtn) approveBtn.disabled = false;
+      if (rejectBtn) rejectBtn.disabled = false;
+    }
+  }
+
+  async function handleReject(requestId) {
+    const approveBtn = document.getElementById(`approve-${requestId}`);
+    const rejectBtn = document.getElementById(`reject-${requestId}`);
+    if (approveBtn) approveBtn.disabled = true;
+    if (rejectBtn) rejectBtn.disabled = true;
+    try {
+      await SECTIONS[currentSection].onReject(requestId);
+    } catch (err) {
+      alert('Could not reject: ' + err.message);
+      if (approveBtn) approveBtn.disabled = false;
+      if (rejectBtn) rejectBtn.disabled = false;
+    }
+  }
+
+  async function setStatus(collectionName, requestId, newStatus, extraFields = {}) {
+    await db.collection(collectionName).doc(requestId).update({
+      status: newStatus,
+      processingError: firebase.firestore.FieldValue.delete(),
+      ...extraFields,
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // student_requests: SDS Phase 3, no-backend version. Retry-safe — if
+  // firebaseUid is already on the document (a previous attempt got
+  // that far before failing on Koha), it's reused instead of trying to
+  // create the account again.
+  // ------------------------------------------------------------------
+  async function approveStudentRequest(requestId) {
+    const doc = latestDocsById[requestId];
+    const data = doc.data();
+    if (!data.encryptedPassword) {
+      throw new Error('No stored password on this request - it may already be approved.');
+    }
+
+    const password = decryptPendingPassword(data.encryptedPassword, PENDING_PASSWORD_SECRET);
+
+    let firebaseUid = data.firebaseUid;
+    if (!firebaseUid) {
+      try {
+        firebaseUid = await createFirebaseAccount(data.email, password);
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') {
+          throw new Error('A Firebase account already exists for this email. Check the Firebase console - this may be a duplicate request.');
+        }
+        throw err;
+      }
+      // Persisted immediately so a later Koha failure doesn't try to
+      // create this Firebase account a second time on retry.
+      await db.collection('student_requests').doc(requestId).update({ firebaseUid });
+    }
+
+    const accessToken = await getKohaAccessToken();
+    const kohaPatron = await createOrFindKohaPatron(accessToken, {
+      fullName: data.fullName,
+      email: data.email,
+      registrationNumber: data.registrationNumber,
+      phone: data.phone,
+      password,
+    });
+    const borrowerNumber = String(kohaPatron.patron_id ?? kohaPatron.borrowernumber ?? '');
+
+    await db.collection('student_requests').doc(requestId).update({
+      status: 'Approved',
+      firebaseUid,
+      borrowerNumber,
+      encryptedPassword: firebase.firestore.FieldValue.delete(),
+      processingError: firebase.firestore.FieldValue.delete(),
+      processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // password_change_requests: SDS Phase 7, no-backend version.
+  // Koha's password is updated directly (staff credentials can do
+  // this). Firebase's password is NOT set directly — a browser
+  // genuinely cannot force-set another account's existing password
+  // without a backend/Admin SDK — instead the student is sent
+  // Firebase's own official password-reset email. They should set it
+  // to the SAME password they originally requested, to keep both
+  // sides in sync; the dashboard shows a reminder note for this.
+  // ------------------------------------------------------------------
+  async function approvePasswordChangeRequest(requestId) {
+    const doc = latestDocsById[requestId];
+    const data = doc.data();
+    if (!data.newEncryptedPassword) {
+      throw new Error('No stored password on this request - it may already be approved.');
+    }
+
+    const newPassword = decryptPendingPassword(data.newEncryptedPassword, PENDING_PASSWORD_SECRET);
+
+    const accessToken = await getKohaAccessToken();
+    const patron = await findKohaPatronByEmail(accessToken, data.email);
+    if (!patron) {
+      throw new Error(`No Koha patron found for ${data.email} - cannot sync the password.`);
+    }
+    const patronId = patron.patron_id ?? patron.borrowernumber;
+    await updateKohaPatronPassword(accessToken, patronId, newPassword);
+
+    await auth.sendPasswordResetEmail(data.email);
+
+    await db.collection('password_change_requests').doc(requestId).update({
+      status: 'Approved',
+      newEncryptedPassword: firebase.firestore.FieldValue.delete(),
+      processingError: firebase.firestore.FieldValue.delete(),
+      processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    alert(
+      `Koha password updated for ${data.email}.\n\n` +
+      `A Firebase "reset your password" email has also been sent to them - ` +
+      `remind the student to set it to the SAME password they originally requested, ` +
+      `so their Firebase and Koha logins stay in sync.`
+    );
+  }
+
+  // Surfaced on BOTH sections. Without this, an admin approving a
   // request would have no way to know it silently failed to actually
   // finish creating/syncing anything.
   function processingErrorBlock(data) {
@@ -369,9 +859,12 @@
     const created = data.createdAt ? data.createdAt.toDate().toLocaleString() : '-';
     const actions = status === 'Pending'
       ? `<div class="request-actions">
-           <button class="btn-approve" onclick="updateStatus('student_requests', '${doc.id}', 'Approved')">Approve</button>
-           <button class="btn-reject" onclick="updateStatus('student_requests', '${doc.id}', 'Rejected')">Reject</button>
+           <button class="btn-approve" id="approve-${doc.id}">Approve</button>
+           <button class="btn-reject" id="reject-${doc.id}">Reject</button>
          </div>`
+      : '';
+    const borrowerRow = data.borrowerNumber
+      ? `<div class="detail-item"><div class="detail-label">Koha Borrower #</div><div class="detail-value">${escapeHtml(data.borrowerNumber)}</div></div>`
       : '';
     return `
       <div class="request-card">
@@ -388,6 +881,7 @@
           <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">${escapeHtml(data.phone || '-')}</div></div>
           <div class="detail-item"><div class="detail-label">CNIC</div><div class="detail-value">${escapeHtml(data.cnic || '-')}</div></div>
           <div class="detail-item"><div class="detail-label">Submitted</div><div class="detail-value">${created}</div></div>
+          ${borrowerRow}
         </div>
         ${processingErrorBlock(data)}
         ${actions}
@@ -402,8 +896,8 @@
     const created = data.createdAt ? data.createdAt.toDate().toLocaleString() : '-';
     const actions = status === 'Pending'
       ? `<div class="request-actions">
-           <button class="btn-approve" onclick="updateStatus('password_change_requests', '${doc.id}', 'Approved')">Approve</button>
-           <button class="btn-reject" onclick="updateStatus('password_change_requests', '${doc.id}', 'Rejected')">Reject</button>
+           <button class="btn-approve" id="approve-${doc.id}">Approve</button>
+           <button class="btn-reject" id="reject-${doc.id}">Reject</button>
          </div>`
       : '';
     return `
@@ -418,20 +912,12 @@
         <div class="detail-grid">
           <div class="detail-item"><div class="detail-label">Requested</div><div class="detail-value">${created}</div></div>
         </div>
+        ${status === 'Pending' ? '<div class="processing-note">Approving will update Koha directly and email the student a Firebase reset link.</div>' : ''}
         ${processingErrorBlock(data)}
         ${actions}
       </div>
     `;
   }
-
-  async function updateStatus(collectionName, requestId, newStatus) {
-    try {
-      await db.collection(collectionName).doc(requestId).update({ status: newStatus });
-    } catch (err) {
-      alert('Could not update status: ' + err.message);
-    }
-  }
-  window.updateStatus = updateStatus;
 
   function escapeHtml(str) {
     const div = document.createElement('div');
